@@ -1,15 +1,40 @@
 import 'package:flutter/material.dart';
+import 'package:stage/service/database.dart';
+import 'package:stage/service/shared_pref.dart';
 import 'package:stage/widget/widget_support.dart';
 
 class Details extends StatefulWidget {
-  const Details({super.key});
+  String name, details, price;
+  Details({
+    super.key,
+    required this.name,
+    required this.details,
+    required this.price,
+  });
 
   @override
   State<Details> createState() => _DetailsState();
 }
 
 class _DetailsState extends State<Details> {
-  int a = 1;
+  int a = 1, total = 0;
+  String? id;
+  getthesharedpref() async {
+    id = await SharedPreferenceHelper().getUserId();
+    setState(() {});
+  }
+
+  ontheload() async {
+    await getthesharedpref();
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    ontheload();
+    total = int.parse(widget.price) * a;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,12 +66,8 @@ class _DetailsState extends State<Details> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Mediterranean",
+                      widget.name,
                       style: AppWidget.semiBoldTextFeildStyle(),
-                    ),
-                    Text(
-                      "Chickpea Salad",
-                      style: AppWidget.boldTextFeildStyle(),
                     ),
                   ],
                 ),
@@ -55,6 +76,7 @@ class _DetailsState extends State<Details> {
                   onTap: () {
                     if (a > 1) {
                       --a;
+                      total = total - int.parse(widget.price);
                     }
                     setState(() {});
                   },
@@ -72,6 +94,7 @@ class _DetailsState extends State<Details> {
                 GestureDetector(
                   onTap: () {
                     ++a;
+                    total = total + int.parse(widget.price);
                     setState(() {});
                   },
                   child: Container(
@@ -86,7 +109,7 @@ class _DetailsState extends State<Details> {
             ),
             SizedBox(height: 20.0),
             Text(
-              "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
+              widget.details,
               maxLines: 4,
               style: AppWidget.LightTextFeildStyle(),
             ),
@@ -116,41 +139,64 @@ class _DetailsState extends State<Details> {
                         "Total Price",
                         style: AppWidget.semiBoldTextFeildStyle(),
                       ),
-                      Text("\$28", style: AppWidget.HeadlineTextFeildStyle()),
+                      Text(
+                        "\$${total.toString()}",
+                        style: AppWidget.HeadlineTextFeildStyle(),
+                      ),
                     ],
                   ),
-                  Container(
-                    width: MediaQuery.of(context).size.width / 2,
-                    padding: EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.black,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Text(
-                          "Add to cart",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16.0,
-                            fontFamily: 'Poppins',
+                  GestureDetector(
+                    onTap: () async {
+                      Map<String, dynamic> addFoodtoCart = {
+                        "Name": widget.name,
+                        "Quantity": a.toString(),
+                        "Total": total.toString(),
+                      };
+                      await DatabaseMethods().addFoodToCart(addFoodtoCart, id!);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          backgroundColor: Colors.orangeAccent,
+                          content: Text(
+                            "Added to cart",
+                            style: TextStyle(fontSize: 18.0),
                           ),
                         ),
-                        SizedBox(width: 30.0),
-                        Container(
-                          padding: EdgeInsets.all(3),
-                          decoration: BoxDecoration(
-                            color: Colors.grey,
-                            borderRadius: BorderRadius.circular(8),
+                      );
+                    },
+
+                    child: Container(
+                      width: MediaQuery.of(context).size.width / 2,
+                      padding: EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.black,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Text(
+                            "Add to cart",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16.0,
+                              fontFamily: 'Poppins',
+                            ),
                           ),
-                          child: Icon(
-                            Icons.shopping_cart_outlined,
-                            color: Colors.white,
+                          SizedBox(width: 30.0),
+                          Container(
+                            padding: EdgeInsets.all(3),
+                            decoration: BoxDecoration(
+                              color: Colors.grey,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Icon(
+                              Icons.shopping_cart_outlined,
+                              color: Colors.white,
+                            ),
                           ),
-                        ),
-                        SizedBox(width: 10.0),
-                      ],
+                          SizedBox(width: 10.0),
+                        ],
+                      ),
                     ),
                   ),
                 ],

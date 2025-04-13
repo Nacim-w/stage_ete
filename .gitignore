@@ -14,6 +14,7 @@ migrate_working_dir/
 lib/widget/app_constant.dart
 google-services.json
 
+
 # IntelliJ related
 *.iml
 *.ipr

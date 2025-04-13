@@ -1,11 +1,9 @@
 import 'dart:io';
 
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:stage/service/database.dart';
 import 'package:stage/widget/widget_support.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:random_string/random_string.dart';
 
 class AddFood extends StatefulWidget {
   const AddFood({super.key});
